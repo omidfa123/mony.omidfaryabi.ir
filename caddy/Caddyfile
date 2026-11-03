@@ -1,0 +1,12 @@
+# DOMAIN comes from .env. With a real domain, Caddy gets a free HTTPS
+# certificate automatically. Use DOMAIN=:80 to run on plain HTTP (no domain).
+{$DOMAIN} {
+	encode zstd gzip
+	header {
+		X-Frame-Options DENY
+		X-Content-Type-Options nosniff
+		Referrer-Policy no-referrer
+		X-Robots-Tag "noindex, nofollow"
+	}
+	reverse_proxy web:3000
+}

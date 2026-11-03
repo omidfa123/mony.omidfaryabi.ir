@@ -1,0 +1,35 @@
+services:
+  api:
+    build: ./backend
+    env_file: .env
+    volumes:
+      - money-data:/data
+    restart: unless-stopped
+    # No ports: only reachable from the web container.
+
+  web:
+    build: ./frontend
+    environment:
+      API_URL: http://api:8080
+    depends_on:
+      - api
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:2.8-alpine
+    env_file: .env
+    ports:
+      - "${HTTP_PORT:-80}:80"
+      - "${HTTPS_PORT:-443}:443"
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - web
+    restart: unless-stopped
+
+volumes:
+  money-data:
+  caddy-data:
+  caddy-config:
